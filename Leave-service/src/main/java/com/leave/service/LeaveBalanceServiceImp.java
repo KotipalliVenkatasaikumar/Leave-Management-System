@@ -40,25 +40,23 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 		return leaveBalanceRepository.findByEmployeeId(employeeId);
 	}
-	
-	
-	public void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances, int numberOfBusinessDays) {
-        // Find the leave balance for the requested leave type
-        LeaveType requestedLeaveType = leaveRequest.getLeaveTypeId();
-        LeaveBalance leaveBalance = balances.stream()
-                .filter(balance -> balance.getLeaveType().equals(requestedLeaveType))
-                .findFirst()
-                .orElse(null);
 
-        if (leaveBalance == null) {
-            throw new InsufficientLeaveBalanceException("Leave balance not found for the requested leave type");
-        }
+	public void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
+			int numberOfBusinessDays) {
+		// Find the leave balance for the requested leave type
+		LeaveType requestedLeaveType = leaveRequest.getLeaveTypeId();
+		LeaveBalance leaveBalance = balances.stream()
+				.filter(balance -> balance.getLeaveType().equals(requestedLeaveType)).findFirst().orElse(null);
 
-        // Check if the leave balance is sufficient for the requested number of days
-        if (leaveBalance.getLeaveBalance() < numberOfBusinessDays) {
-            throw new InsufficientLeaveBalanceException("Insufficient leave balance for the requested leave type");
-        }
-    }
+		if (leaveBalance == null) {
+			throw new InsufficientLeaveBalanceException("Leave balance not found for the requested leave type");
+		}
+
+		// Check if the leave balance is sufficient for the requested number of days
+		if (leaveBalance.getLeaveBalance() < numberOfBusinessDays) {
+			throw new InsufficientLeaveBalanceException("Insufficient leave balance for the requested leave type");
+		}
+	}
 
 	@Override
 	public void updateLeaveBalanceForApprovedRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
@@ -70,8 +68,7 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 				if (leaveRequest.getStatus().equalsIgnoreCase("Pending")) {
 					balance.setLeaveBalance(balance.getLeaveBalance() - numberOfDays);
 				}
-				
-				
+
 				else if (leaveRequest.getStatus().equalsIgnoreCase("Rejected")) {
 					balance.setLeaveBalance(balance.getLeaveBalance() + numberOfDays);
 				}
