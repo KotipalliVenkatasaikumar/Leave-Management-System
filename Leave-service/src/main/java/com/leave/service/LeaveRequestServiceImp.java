@@ -1,5 +1,6 @@
 package com.leave.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
@@ -26,6 +27,41 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 
 	@Autowired
 	private LeaveBalanceRepository balanceRepository;
+
+//	@Override
+//	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
+//		leaveRequest.setStatus("Pending");
+//
+//		// Retrieve existing leave balances for the employee
+//		List<LeaveBalance> balances = balanceService
+//				.getLeaveBalanceByEmployeeId(leaveRequest.getEmployeeId().getEmployeeId());
+//
+//		if (balances.isEmpty()) {
+//
+//			List<LeaveType> leaveTypes = leaveTypeService.getAllLeaveTypes();
+//
+//			for (LeaveType leaveType : leaveTypes) {
+//
+//				LeaveBalance leaveBalance = new LeaveBalance();
+//
+//				leaveBalance.setEmployee(leaveRequest.getEmployeeId());
+//				leaveBalance.setLeaveBalance(leaveType.getDefaultLeaves());
+//				leaveBalance.setLeaveType(leaveType);
+//				leaveBalance.setYear(Year.now().getValue());
+//
+//				balances.add(leaveBalance);
+//			}
+//
+//			balanceRepository.saveAll(balances);
+//		}
+//
+//		int numberOfBusinessDays = calculateNumberOfBusinessDays(leaveRequest.getStartDate(),
+//				leaveRequest.getEndDate());
+//
+//		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfBusinessDays);
+//
+//		return leaveRequestRepository.save(leaveRequest);
+//	}
 
 	@Override
 	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
@@ -54,9 +90,14 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 			balanceRepository.saveAll(balances);
 		}
 
-		int numberOfDays = calculateNumberOfDays(leaveRequest.getStartDate(), leaveRequest.getEndDate());
+		int numberOfBusinessDays = calculateNumberOfBusinessDays(leaveRequest.getStartDate(),
+				leaveRequest.getEndDate());
 
-		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfDays);
+		// Validate leave balance
+		balanceService.validateLeaveBalanceForRequest(leaveRequest, balances, numberOfBusinessDays);
+
+		// If validation passes, update leave balance
+		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfBusinessDays);
 
 		return leaveRequestRepository.save(leaveRequest);
 	}
@@ -102,11 +143,13 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 		List<LeaveBalance> balances = balanceService
 				.getLeaveBalanceByEmployeeId(updatedLeaveRequest.getEmployeeId().getEmployeeId());
 
-		int numberOfDays = calculateNumberOfDays(updatedLeaveRequest.getStartDate(), updatedLeaveRequest.getEndDate());
+		int numberOfDays = calculateNumberOfBusinessDays(updatedLeaveRequest.getStartDate(),
+				updatedLeaveRequest.getEndDate());
 
 		balanceService.updateLeaveBalanceForApprovedRequest(existingLeaveRequest, balances, numberOfDays);
 
 		return leaveRequestRepository.save(existingLeaveRequest);
+
 	}
 
 	@Override
@@ -114,8 +157,16 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 		return leaveRequestRepository.findByEmployeeId(employeeId);
 	}
 
-	public int calculateNumberOfDays(LocalDate startDate, LocalDate endDate) {
-		return (int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1;
+	public int calculateNumberOfBusinessDays(LocalDate startDate, LocalDate endDate) {
+		int businessDays = 0;
+		LocalDate date = startDate;
+		while (!date.isAfter(endDate)) {
+			if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY) {
+				businessDays++;
+			}
+			date = date.plusDays(1);
+		}
+		return businessDays;
 	}
 
 }

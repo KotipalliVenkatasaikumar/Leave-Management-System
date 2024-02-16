@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.commonmodels.entity.LeaveBalance;
 import com.commonmodels.entity.LeaveRequest;
+import com.commonmodels.entity.LeaveType;
+import com.leave.exceptions.InsufficientLeaveBalanceException;
 import com.leave.repository.LeaveBalanceRepository;
 
 @Service
@@ -38,6 +40,25 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 		return leaveBalanceRepository.findByEmployeeId(employeeId);
 	}
+	
+	
+	public void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances, int numberOfBusinessDays) {
+        // Find the leave balance for the requested leave type
+        LeaveType requestedLeaveType = leaveRequest.getLeaveTypeId();
+        LeaveBalance leaveBalance = balances.stream()
+                .filter(balance -> balance.getLeaveType().equals(requestedLeaveType))
+                .findFirst()
+                .orElse(null);
+
+        if (leaveBalance == null) {
+            throw new InsufficientLeaveBalanceException("Leave balance not found for the requested leave type");
+        }
+
+        // Check if the leave balance is sufficient for the requested number of days
+        if (leaveBalance.getLeaveBalance() < numberOfBusinessDays) {
+            throw new InsufficientLeaveBalanceException("Insufficient leave balance for the requested leave type");
+        }
+    }
 
 	@Override
 	public void updateLeaveBalanceForApprovedRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,

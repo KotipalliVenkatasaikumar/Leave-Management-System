@@ -21,6 +21,9 @@ public interface LeaveBalanceService {
 	 void updateLeaveBalanceForApprovedRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
 			int numberOfDays) ;
 
+	void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
+			int numberOfBusinessDays);
+
 
 
 	
