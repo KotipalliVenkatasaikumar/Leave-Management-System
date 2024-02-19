@@ -47,6 +47,7 @@ public class LeaveTypeServiceImp implements LeaveTypeService {
 
 			if (updatedLeaveType.getLeaveTypeName() != null) {
 				existingLeaveType.setLeaveTypeName(updatedLeaveType.getLeaveTypeName());
+				existingLeaveType.setDefaultLeaves(updatedLeaveType.getDefaultLeaves());
 			}
 
 			return leaveTypeRepository.save(existingLeaveType);

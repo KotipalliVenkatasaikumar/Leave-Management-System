@@ -43,8 +43,9 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 	public void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
 			int numberOfBusinessDays) {
-		// Find the leave balance for the requested leave type
+		
 		LeaveType requestedLeaveType = leaveRequest.getLeaveTypeId();
+		
 		LeaveBalance leaveBalance = balances.stream()
 				.filter(balance -> balance.getLeaveType().equals(requestedLeaveType)).findFirst().orElse(null);
 
