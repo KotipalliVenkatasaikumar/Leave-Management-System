@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.commonmodels.entity.LeaveBalance;
 import com.commonmodels.entity.LeaveRequest;
+import com.leave.DTO.LeaveBalanceDTO;
 import com.leave.service.LeaveBalanceService;
 
 @RestController
@@ -46,6 +47,11 @@ public class LeaveBalanceController {
 		List<LeaveBalance> leaveBalance = leaveBalanceService.getLeaveBalanceByEmployeeId(employeeId);
 		return ResponseEntity.ok(leaveBalance);
 	}
-
+	
+	@GetMapping("/leavebalancebyemployeeid/{employeeId}")
+	public ResponseEntity<List<LeaveBalanceDTO>> getLeaveBalanceDtoByEmployeeId(@PathVariable Integer employeeId) {
+		List<LeaveBalanceDTO> leaveBalance = leaveBalanceService.getLeaveBalanceDtoByEmployeeId(employeeId);
+		return ResponseEntity.ok(leaveBalance);
+	}
 	
 }

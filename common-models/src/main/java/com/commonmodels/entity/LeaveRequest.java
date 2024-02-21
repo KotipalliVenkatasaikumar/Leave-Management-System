@@ -28,7 +28,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-
 @Table(name = "LeaveRequest")
 
 @NamedQuery(name = "LeaveRequest.findByEmployeeId", query = "SELECT lr FROM LeaveRequest lr WHERE lr.employeeId = :employeeId")
@@ -68,5 +67,7 @@ public class LeaveRequest {
 	
 	@Column(name="description")
 	private String description;
+	
+	private long numberOfDays;
 
 }

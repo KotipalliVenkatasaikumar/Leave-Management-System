@@ -122,6 +122,7 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 
 	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
 		leaveRequest.setStatus("Pending");
+		
 
 		// Retrieve existing leave balances for the employee
 		List<LeaveBalance> balances = balanceService
@@ -148,6 +149,7 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 		// Calculate number of business days excluding weekends and holidays
 		int numberOfBusinessDays = calculateNumberOfBusinessDays(leaveRequest.getStartDate(), leaveRequest.getEndDate(),
 				holidays);
+		leaveRequest.setNumberOfDays(numberOfBusinessDays);
 
 		// Validate leave balance
 		balanceService.validateLeaveBalanceForRequest(leaveRequest, balances, numberOfBusinessDays);

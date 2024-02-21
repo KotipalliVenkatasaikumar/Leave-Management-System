@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.commonmodels.entity.LeaveBalance;
 import com.commonmodels.entity.LeaveRequest;
+import com.leave.DTO.LeaveBalanceDTO;
 
 @Service
 public interface LeaveBalanceService {
@@ -23,6 +24,8 @@ public interface LeaveBalanceService {
 
 	void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
 			int numberOfBusinessDays);
+
+	List<LeaveBalanceDTO> getLeaveBalanceDtoByEmployeeId(Integer employeeId);
 
 
 

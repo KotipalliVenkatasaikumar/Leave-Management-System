@@ -73,7 +73,9 @@ public class EmployeeServiceImp implements EmployeeService {
 	public ResponseEntity<Employee> getLoginUser(LoginDTO loginDTO) {
 
 		if (loginDTO.getEmail() == null || loginDTO.getPassword() == null) {
+			
 			log.info("Bad request {}",loginDTO.getPassword());
+			
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 		}
 
