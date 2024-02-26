@@ -73,6 +73,7 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 				else if (leaveRequest.getStatus().equalsIgnoreCase("Rejected")) {
 					balance.setLeaveBalance(balance.getLeaveBalance() + numberOfDays);
+
 				}
 
 				break;
@@ -84,7 +85,6 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 	@Override
 	public List<LeaveBalanceDTO> getLeaveBalanceDtoByEmployeeId(Integer employeeId) {
-		List<LeaveBalanceDTO> findLeaveBalanceByEmployeeId = leaveBalanceRepository.findLeaveBalanceByEmployeeId(employeeId);
 		return leaveBalanceRepository.findLeaveBalanceByEmployeeId(employeeId);
 	}
 

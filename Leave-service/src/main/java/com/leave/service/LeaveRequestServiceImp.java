@@ -28,9 +28,12 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 
 	@Autowired
 	private LeaveBalanceRepository balanceRepository;
- 
+
 	@Autowired
 	private HolidayService holidayService;
+
+	@Autowired
+	private EmailSenderService emailSenderService;
 
 //	@Override
 //	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
@@ -122,7 +125,6 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 
 	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
 		leaveRequest.setStatus("Pending");
-		
 
 		// Retrieve existing leave balances for the employee
 		List<LeaveBalance> balances = balanceService
@@ -157,10 +159,21 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 		// If validation passes, update leave balance
 		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfBusinessDays);
 
-		return leaveRequestRepository.save(leaveRequest);
+		LeaveRequest leRequest = leaveRequestRepository.save(leaveRequest);
+
+		String emailBody = "Dear " + leaveRequest.getEmployeeId().getEmployeeName() + ",\n\n"
+				+ "Your leave request has been submitted successfully for the following period:\n" + "Start Date: "
+				+ leaveRequest.getStartDate() + "\n" + "End Date: " + leaveRequest.getEndDate() + "\n" + "Reason: "
+				+ leaveRequest.getReason() + "\n\n" + "Thank you for your submission.\n\n" + "Best regards,\n"
+				+ "Leave Management Team \n" + "CoreNuts Technologies";
+
+		emailSenderService.sendSimpleEmail(leaveRequest.getEmployeeId().getEmail(), "Leave Request - Notification",
+				emailBody);
+		return leRequest;
 	}
 
 	public int calculateNumberOfBusinessDays(LocalDate startDate, LocalDate endDate, List<Holiday> holidays) {
+
 		int businessDays = 0;
 		LocalDate date = startDate;
 		while (!date.isAfter(endDate)) {
@@ -229,7 +242,32 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 
 		balanceService.updateLeaveBalanceForApprovedRequest(existingLeaveRequest, balances, numberOfDays);
 
-		return leaveRequestRepository.save(existingLeaveRequest);
+		LeaveRequest leRequest = leaveRequestRepository.save(existingLeaveRequest);
+
+		if (updatedLeaveRequest.getStatus().equalsIgnoreCase("Approved")) {
+			emailSenderService.sendSimpleEmail(existingLeaveRequest.getEmployeeId().getEmail(),
+					"Leave Request Approved - Notification",
+					"Dear " + existingLeaveRequest.getEmployeeId().getEmployeeName() + ",\n\n"
+							+ "CoreNuts Technologies is pleased to inform you that your leave request has been approved for the following period:\n"
+							+ "Start Date: " + existingLeaveRequest.getStartDate() + "\n" + "End Date: "
+							+ existingLeaveRequest.getEndDate() + "\n" + "Number of days: "
+							+ existingLeaveRequest.getNumberOfDays() + "\n\n"
+							+ "Thank you for your patience and cooperation.\n\n" + "Best regards,\n"
+							+ "Leave Management Team");
+
+		} else if (updatedLeaveRequest.getStatus().equalsIgnoreCase("Rejected")) {
+			emailSenderService.sendSimpleEmail(existingLeaveRequest.getEmployeeId().getEmail(),
+					"Leave Request Rejected - Notification",
+					"Dear " + existingLeaveRequest.getEmployeeId().getEmployeeName() + ",\n\n"
+							+ "CoreNuts Technologies regrets to inform you that your leave request has been rejected for the following period:\n"
+							+ "Start Date: " + existingLeaveRequest.getStartDate() + "\n" + "End Date: "
+							+ existingLeaveRequest.getEndDate() + "\n" + "Number of days: "
+							+ existingLeaveRequest.getNumberOfDays() + "\n" + "Reason for rejection: "
+							+ existingLeaveRequest.getDescription() + "\n\n" + "Thank you for your understanding.\n\n"
+							+ "Best regards,\n" + "Leave Management Team");
+
+		}
+		return leRequest;
 	}
 
 	@Override

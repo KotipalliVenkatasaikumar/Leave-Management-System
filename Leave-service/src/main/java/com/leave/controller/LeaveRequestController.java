@@ -67,5 +67,7 @@ public class LeaveRequestController {
 		List<LeaveRequest> leaveRequests = leaveRequestService.getLeaveRequestsByEmployeeId(employeeId);
 		return ResponseEntity.ok(leaveRequests);
 	}
+	
+	
 
 }
