@@ -1,5 +1,6 @@
 package com.commonmodels.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-public class Holiday {
+public class Holiday implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;

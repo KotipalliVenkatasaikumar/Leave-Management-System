@@ -17,6 +17,8 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 	@Autowired
 	private LeaveBalanceRepository leaveBalanceRepository;
+	@Autowired
+	private EmailSenderService emailSenderService;
 
 	@Override
 	public LeaveBalance saveLeaveBalance(LeaveBalance leaveBalance) {
@@ -66,20 +68,51 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 
 		for (LeaveBalance balance : balances) {
 			if (balance.getLeaveType().getLeaveTypeId() == leaveRequest.getLeaveTypeId().getLeaveTypeId()) {
-
 				if (leaveRequest.getStatus().equalsIgnoreCase("Pending")) {
 					balance.setLeaveBalance(balance.getLeaveBalance() - numberOfDays);
-				}
 
-				else if (leaveRequest.getStatus().equalsIgnoreCase("Rejected")) {
+					// Send email notification for pending request
+					String emailBody = "Dear " + leaveRequest.getEmployee().getEmployeeName() + ",\n\n"
+							+ "Your leave request has been submitted successfully for the following period:\n"
+							+ "Start Date: " + leaveRequest.getStartDate() + "\n" + "End Date: "
+							+ leaveRequest.getEndDate() + "\n" + "Reason: " + leaveRequest.getReason() + "\n\n"
+							+ "Thank you for your submission.\n\n" + "Best regards,\n" + "Leave Management Team \n"
+							+ "CoreNuts Technologies";
+
+					emailSenderService.sendSimpleEmail(leaveRequest.getEmployee().getEmail(),
+							"Leave Request - Notification", emailBody);
+				} else if (leaveRequest.getStatus().equalsIgnoreCase("Approved")) {
+					// Send email notification for approved request
+					String emailBody = "Dear " + leaveRequest.getEmployee().getEmployeeName() + ",\n\n"
+							+ "CoreNuts Technologies is pleased to inform you that your leave request has been approved for the following period:\n"
+							+ "Start Date: " + leaveRequest.getStartDate() + "\n" + "End Date: "
+							+ leaveRequest.getEndDate() + "\n" + "Number of days: " + leaveRequest.getNumberOfDays()
+							+ "\n\n" + "Thank you for your patience and cooperation.\n\n" + "Best regards,\n"
+							+ "Leave Management Team";
+
+					emailSenderService.sendSimpleEmail(leaveRequest.getEmployee().getEmail(),
+							"Leave Request Approved - Notification", emailBody);
+
+				} else if (leaveRequest.getStatus().equalsIgnoreCase("Rejected")) {
+
 					balance.setLeaveBalance(balance.getLeaveBalance() + numberOfDays);
 
+					// Send email notification for rejected request
+					String emailBody = "Dear " + leaveRequest.getEmployee().getEmployeeName() + ",\n\n"
+							+ "CoreNuts Technologies regrets to inform you that your leave request has been rejected for the following period:\n"
+							+ "Start Date: " + leaveRequest.getStartDate() + "\n" + "End Date: "
+							+ leaveRequest.getEndDate() + "\n" + "Number of days: " + leaveRequest.getNumberOfDays()
+							+ "\n" + "Reason for rejection: " + leaveRequest.getDescription() + "\n\n"
+							+ "Thank you for your understanding.\n\n" + "Best regards,\n" + "Leave Management Team";
+
+					emailSenderService.sendSimpleEmail(leaveRequest.getEmployee().getEmail(),
+							"Leave Request Rejected - Notification", emailBody);
 				}
 
+				// Assuming only one leave type should match, so exit loop
 				break;
 			}
 		}
-
 		leaveBalanceRepository.saveAll(balances);
 	}
 

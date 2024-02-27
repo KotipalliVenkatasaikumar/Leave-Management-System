@@ -29,7 +29,7 @@ public class LeaveRequestController {
 
 	@PostMapping("/save")
 	public ResponseEntity<LeaveRequest> saveLeaveRequest(@RequestBody LeaveRequest leaveRequest) {
-
+		log.info("leave request {}",leaveRequest);
 		LeaveRequest savedLeaveRequest = leaveRequestService.saveLeaveRequest(leaveRequest);
 
 		return ResponseEntity.ok(savedLeaveRequest);

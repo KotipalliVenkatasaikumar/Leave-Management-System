@@ -31,7 +31,8 @@ public class LeaveBalance {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "balance_id")
 	private int balanceId;
-
+    
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
 	private Employee employee;

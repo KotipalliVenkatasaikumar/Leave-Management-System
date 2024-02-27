@@ -49,6 +49,7 @@ public class EmployeeServiceImp implements EmployeeService {
 	public Employee updateEmployee(Integer id, Employee updatedEmployee) {
 
 		Optional<Employee> optionalExistingEmployee = employeeRepository.findById(id);
+		
 		if (optionalExistingEmployee.isPresent()) {
 			Employee existingEmployee = optionalExistingEmployee.get();
 

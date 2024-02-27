@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.commonmodels.entity.Holiday;
-import com.commonmodels.entity.LeaveBalance;
-import com.commonmodels.entity.LeaveRequest;
-import com.commonmodels.entity.LeaveType;
 import com.leave.service.HolidayService;
 
 @RestController

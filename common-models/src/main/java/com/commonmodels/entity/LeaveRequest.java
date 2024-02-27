@@ -21,7 +21,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 @Data
 @Setter
 @Getter
@@ -30,7 +32,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "LeaveRequest")
 
-@NamedQuery(name = "LeaveRequest.findByEmployeeId", query = "SELECT lr FROM LeaveRequest lr WHERE lr.employeeId = :employeeId")
+
+@NamedQuery(name = "LeaveRequest.findByEmployeeId", query = "SELECT lr FROM LeaveRequest lr WHERE lr.employee.employeeId = :employeeId")
 public class LeaveRequest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +43,7 @@ public class LeaveRequest {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
 //	@Column(name="employee_id")
-	private Employee employeeId;
+	private Employee employee;
 
 	@Column(name = "start_date")
 	private LocalDate startDate;

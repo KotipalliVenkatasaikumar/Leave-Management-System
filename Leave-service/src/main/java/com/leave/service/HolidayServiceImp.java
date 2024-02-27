@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.commonmodels.entity.Holiday;
-import com.commonmodels.entity.LeaveType;
 import com.leave.repository.HolidayRepository;
 
 @Service

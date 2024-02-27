@@ -16,6 +16,9 @@ import com.commonmodels.entity.LeaveType;
 import com.leave.repository.LeaveBalanceRepository;
 import com.leave.repository.LeaveRequestRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class LeaveRequestServiceImp implements LeaveRequestService {
 	@Autowired
@@ -35,107 +38,20 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 	@Autowired
 	private EmailSenderService emailSenderService;
 
-//	@Override
-//	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
-//		leaveRequest.setStatus("Pending");
-//
-//		// Retrieve existing leave balances for the employee
-//		List<LeaveBalance> balances = balanceService
-//				.getLeaveBalanceByEmployeeId(leaveRequest.getEmployeeId().getEmployeeId());
-//
-//		if (balances.isEmpty()) {
-//
-//			List<LeaveType> leaveTypes = leaveTypeService.getAllLeaveTypes();
-//
-//			for (LeaveType leaveType : leaveTypes) {
-//
-//				LeaveBalance leaveBalance = new LeaveBalance();
-//
-//				leaveBalance.setEmployee(leaveRequest.getEmployeeId());
-//				leaveBalance.setLeaveBalance(leaveType.getDefaultLeaves());
-//				leaveBalance.setLeaveType(leaveType);
-//				leaveBalance.setYear(Year.now().getValue());
-//
-//				balances.add(leaveBalance);
-//			}
-//
-//			balanceRepository.saveAll(balances);
-//		}
-//
-//		int numberOfBusinessDays = calculateNumberOfBusinessDays(leaveRequest.getStartDate(),
-//				leaveRequest.getEndDate());
-//
-//		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfBusinessDays);
-//
-//		return leaveRequestRepository.save(leaveRequest);
-//	}
-
-//	@Override
-//	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
-//		leaveRequest.setStatus("Pending");
-//
-//		// Retrieve existing leave balances for the employee
-//		List<LeaveBalance> balances = balanceService
-//				.getLeaveBalanceByEmployeeId(leaveRequest.getEmployeeId().getEmployeeId());
-//
-//		if (balances.isEmpty()) {
-//
-//			List<LeaveType> leaveTypes = leaveTypeService.getAllLeaveTypes();
-//
-//			for (LeaveType leaveType : leaveTypes) {
-//
-//				LeaveBalance leaveBalance = new LeaveBalance();
-//
-//				leaveBalance.setEmployee(leaveRequest.getEmployeeId());
-//				leaveBalance.setLeaveBalance(leaveType.getDefaultLeaves());
-//				leaveBalance.setLeaveType(leaveType);
-//				leaveBalance.setYear(Year.now().getValue());
-//
-//				balances.add(leaveBalance);
-//			}
-//
-//			balanceRepository.saveAll(balances);
-//		}
-//
-//		int numberOfBusinessDays = calculateNumberOfBusinessDays(leaveRequest.getStartDate(),
-//				leaveRequest.getEndDate());
-//
-//		// Validate leave balance
-//		balanceService.validateLeaveBalanceForRequest(leaveRequest, balances, numberOfBusinessDays);
-//
-//		// If validation passes, update leave balance
-//		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfBusinessDays);
-//
-//		return leaveRequestRepository.save(leaveRequest);
-//	}
-//	
-//	
-//	public int calculateNumberOfBusinessDays(LocalDate startDate, LocalDate endDate) {
-//		int businessDays = 0;
-//		LocalDate date = startDate;
-//		while (!date.isAfter(endDate)) {
-//			if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY) {
-//				businessDays++;
-//			}
-//			date = date.plusDays(1);
-//		}
-//		return businessDays;
-//	}
-//	
-
+	@Override
 	public LeaveRequest saveLeaveRequest(LeaveRequest leaveRequest) {
 		leaveRequest.setStatus("Pending");
-
+		log.info("leave request {}", leaveRequest);
 		// Retrieve existing leave balances for the employee
 		List<LeaveBalance> balances = balanceService
-				.getLeaveBalanceByEmployeeId(leaveRequest.getEmployeeId().getEmployeeId());
+				.getLeaveBalanceByEmployeeId(leaveRequest.getEmployee().getEmployeeId());
 
 		if (balances.isEmpty()) {
 			List<LeaveType> leaveTypes = leaveTypeService.getAllLeaveTypes();
 
 			for (LeaveType leaveType : leaveTypes) {
 				LeaveBalance leaveBalance = new LeaveBalance();
-				leaveBalance.setEmployee(leaveRequest.getEmployeeId());
+				leaveBalance.setEmployee(leaveRequest.getEmployee());
 				leaveBalance.setLeaveBalance(leaveType.getDefaultLeaves());
 				leaveBalance.setLeaveType(leaveType);
 				leaveBalance.setYear(Year.now().getValue());
@@ -159,17 +75,7 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 		// If validation passes, update leave balance
 		balanceService.updateLeaveBalanceForApprovedRequest(leaveRequest, balances, numberOfBusinessDays);
 
-		LeaveRequest leRequest = leaveRequestRepository.save(leaveRequest);
-
-		String emailBody = "Dear " + leaveRequest.getEmployeeId().getEmployeeName() + ",\n\n"
-				+ "Your leave request has been submitted successfully for the following period:\n" + "Start Date: "
-				+ leaveRequest.getStartDate() + "\n" + "End Date: " + leaveRequest.getEndDate() + "\n" + "Reason: "
-				+ leaveRequest.getReason() + "\n\n" + "Thank you for your submission.\n\n" + "Best regards,\n"
-				+ "Leave Management Team \n" + "CoreNuts Technologies";
-
-		emailSenderService.sendSimpleEmail(leaveRequest.getEmployeeId().getEmail(), "Leave Request - Notification",
-				emailBody);
-		return leRequest;
+		return leaveRequestRepository.save(leaveRequest);
 	}
 
 	public int calculateNumberOfBusinessDays(LocalDate startDate, LocalDate endDate, List<Holiday> holidays) {
@@ -229,12 +135,12 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 		existingLeaveRequest.setLeaveTypeId(updatedLeaveRequest.getLeaveTypeId());
 		existingLeaveRequest.setReason(updatedLeaveRequest.getReason());
 		existingLeaveRequest.setManagerId(updatedLeaveRequest.getManagerId());
-		existingLeaveRequest.setEmployeeId(updatedLeaveRequest.getEmployeeId());
+		existingLeaveRequest.setEmployee(updatedLeaveRequest.getEmployee());
 		existingLeaveRequest.setStatus(updatedLeaveRequest.getStatus());
 		existingLeaveRequest.setDescription(updatedLeaveRequest.getDescription());
 
 		List<LeaveBalance> balances = balanceService
-				.getLeaveBalanceByEmployeeId(updatedLeaveRequest.getEmployeeId().getEmployeeId());
+				.getLeaveBalanceByEmployeeId(updatedLeaveRequest.getEmployee().getEmployeeId());
 
 		int numberOfDays = calculateNumberOfBusinessDays(updatedLeaveRequest.getStartDate(),
 				updatedLeaveRequest.getEndDate(),
@@ -242,32 +148,9 @@ public class LeaveRequestServiceImp implements LeaveRequestService {
 
 		balanceService.updateLeaveBalanceForApprovedRequest(existingLeaveRequest, balances, numberOfDays);
 
-		LeaveRequest leRequest = leaveRequestRepository.save(existingLeaveRequest);
+		
+		return leaveRequestRepository.save(existingLeaveRequest);
 
-		if (updatedLeaveRequest.getStatus().equalsIgnoreCase("Approved")) {
-			emailSenderService.sendSimpleEmail(existingLeaveRequest.getEmployeeId().getEmail(),
-					"Leave Request Approved - Notification",
-					"Dear " + existingLeaveRequest.getEmployeeId().getEmployeeName() + ",\n\n"
-							+ "CoreNuts Technologies is pleased to inform you that your leave request has been approved for the following period:\n"
-							+ "Start Date: " + existingLeaveRequest.getStartDate() + "\n" + "End Date: "
-							+ existingLeaveRequest.getEndDate() + "\n" + "Number of days: "
-							+ existingLeaveRequest.getNumberOfDays() + "\n\n"
-							+ "Thank you for your patience and cooperation.\n\n" + "Best regards,\n"
-							+ "Leave Management Team");
-
-		} else if (updatedLeaveRequest.getStatus().equalsIgnoreCase("Rejected")) {
-			emailSenderService.sendSimpleEmail(existingLeaveRequest.getEmployeeId().getEmail(),
-					"Leave Request Rejected - Notification",
-					"Dear " + existingLeaveRequest.getEmployeeId().getEmployeeName() + ",\n\n"
-							+ "CoreNuts Technologies regrets to inform you that your leave request has been rejected for the following period:\n"
-							+ "Start Date: " + existingLeaveRequest.getStartDate() + "\n" + "End Date: "
-							+ existingLeaveRequest.getEndDate() + "\n" + "Number of days: "
-							+ existingLeaveRequest.getNumberOfDays() + "\n" + "Reason for rejection: "
-							+ existingLeaveRequest.getDescription() + "\n\n" + "Thank you for your understanding.\n\n"
-							+ "Best regards,\n" + "Leave Management Team");
-
-		}
-		return leRequest;
 	}
 
 	@Override

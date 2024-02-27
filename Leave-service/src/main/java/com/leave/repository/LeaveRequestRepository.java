@@ -11,6 +11,6 @@ import com.commonmodels.entity.LeaveRequest;
 @Repository
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Integer> {
 
-	@Query("SELECT lr FROM LeaveRequest lr WHERE lr.employeeId.employeeId = :employeeId")
+	@Query("SELECT lr FROM LeaveRequest lr WHERE lr.employee.employeeId = :employeeId")
 	List<LeaveRequest> findByEmployeeId(int employeeId);
 }
