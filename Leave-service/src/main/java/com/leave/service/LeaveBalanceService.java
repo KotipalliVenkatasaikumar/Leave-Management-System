@@ -19,18 +19,11 @@ public interface LeaveBalanceService {
 
 	List<LeaveBalance> getLeaveBalanceByEmployeeId(Integer employeeId);
 
-	 void updateLeaveBalanceForApprovedRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
-			int numberOfDays) ;
+	void updateLeaveBalanceForApprovedRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances, int numberOfDays);
 
 	void validateLeaveBalanceForRequest(LeaveRequest leaveRequest, List<LeaveBalance> balances,
 			int numberOfBusinessDays);
 
 	List<LeaveBalanceDTO> getLeaveBalanceDtoByEmployeeId(Integer employeeId);
-
-
-
-	
-	
-	
 
 }

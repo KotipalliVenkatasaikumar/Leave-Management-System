@@ -49,6 +49,7 @@ public class LeaveTypeServiceImp implements LeaveTypeService {
 				existingLeaveType.setLeaveTypeName(updatedLeaveType.getLeaveTypeName());
 				existingLeaveType.setDefaultLeaves(updatedLeaveType.getDefaultLeaves());
 			}
+			
 
 			return leaveTypeRepository.save(existingLeaveType);
 		} else {

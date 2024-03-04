@@ -50,11 +50,10 @@ public class EmployeeController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteEmployee(@PathVariable int id) {
-		employeeService.deleteEmployee(id);
-		return ResponseEntity.noContent().build();
-	}
-
+    public ResponseEntity<Void> deleteEmployee(@PathVariable int id) {
+        employeeService.deleteEmployee(id);
+        return ResponseEntity.noContent().build();
+    }
 	@PutMapping("/{id}")
 	public ResponseEntity<Employee> updateEmployee(@PathVariable Integer id, @RequestBody Employee updatedEmployee) {
 		Employee updateEmployee = employeeService.updateEmployee(id, updatedEmployee);
