@@ -78,7 +78,7 @@ public class LeaveBalanceServiceImp implements LeaveBalanceService {
 							+ leaveRequest.getEndDate() + "\n" + "Reason: " + leaveRequest.getReason() + "\n\n"
 							+ "Thank you for your submission.\n\n" + "Best regards,\n" + "Leave Management Team \n"
 							+ "CoreNuts Technologies";
-
+					// send mail
 					emailSenderService.sendSimpleEmail(leaveRequest.getEmployee().getEmail(),
 							"Leave Request - Notification", emailBody);
 				} else if (leaveRequest.getStatus().equalsIgnoreCase("Approved")) {
